@@ -10,16 +10,25 @@ const defaults: Settings = {
   lowStorageThresholdGB: 10,
   largeFileThresholdMB: 100,
   maxScanDepth: 6,
-  allowRecycleBin: true
+  allowRecycleBin: true,
+  agentEnabled: false,
+  agentIntervalMinutes: 30,
+  agentLowThresholdGB: 10,
+  paystackPublicKey: '',
+  paystackPlanCode: '',
+  agentSubscriptionActive: false,
+  agentSubscriptionExpiresAt: 0,
+  agentSubscriptionReference: ''
 }
 
-export function registerSettingsIpc(ipcMain: any, store: Store) {
+export function registerSettingsIpc(ipcMain: any, store: Store, onChanged?: (s: Settings) => void) {
   ipcMain.handle('settings:get', async () => {
     const s = (store.get('settings') as Settings) || {}
     return { ...defaults, ...s }
   })
   ipcMain.handle('settings:set', async (_e: any, s: Settings) => {
     store.set('settings', s)
+    if (onChanged) onChanged(s)
     return true
   })
 }

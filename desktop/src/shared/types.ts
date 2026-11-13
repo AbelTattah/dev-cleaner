@@ -56,4 +56,12 @@ export interface Settings {
   largeFileThresholdMB: number
   maxScanDepth: number
   allowRecycleBin: boolean
+  agentEnabled: boolean
+  agentIntervalMinutes: number
+  agentLowThresholdGB: number
+  paystackPublicKey: string
+  paystackPlanCode: string
+  agentSubscriptionActive: boolean
+  agentSubscriptionExpiresAt: number
+  agentSubscriptionReference: string
 }
