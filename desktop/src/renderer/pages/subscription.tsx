@@ -40,7 +40,7 @@ export function SubscriptionPage() {
         plan: PAYSTACK_PLAN_CODE || undefined,
         callback: (response: any) => {
           const expires = Date.now() + 30 * 24 * 60 * 60 * 1000
-          const updated = { ...s, agentSubscriptionActive: true, agentSubscriptionExpiresAt: expires, agentSubscriptionReference: response.reference }
+          const updated = { ...s, agentEnabled: true, agentSubscriptionActive: true, agentSubscriptionExpiresAt: expires, agentSubscriptionReference: response.reference }
           setS(updated)
           window.api.settings.set(updated)
           setStore(updated)
@@ -53,6 +53,17 @@ export function SubscriptionPage() {
       toast.error(e?.message || 'Payment failed')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const restore = async () => {
+    const x = await window.api.settings.get()
+    setS(x)
+    setStore(x)
+    if (x.agentSubscriptionActive && (x.agentSubscriptionExpiresAt || 0) > Date.now()) {
+      toast.success('Subscription restored')
+    } else {
+      toast.info('No active subscription found')
     }
   }
 
@@ -92,6 +103,9 @@ export function SubscriptionPage() {
               />
               <Button onClick={subscribe} disabled={loading} className="w-full">
                 {loading ? 'Opening payment...' : `Subscribe for GHS ${PRO_PRICE_GHS}/month`}
+              </Button>
+              <Button variant="outline" onClick={restore} className="w-full">
+                Restore subscription
               </Button>
             </div>
           )}
