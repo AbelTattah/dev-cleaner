@@ -45,6 +45,43 @@ function protectedPath(p: string, protectedDirs: string[]): boolean {
   return all.some(pr => lower === pr || lower.startsWith(pr + '\\') || lower.startsWith(pr + '/'))
 }
 
+export async function runCleanupTask(task: string, opts: any = {}): Promise<{ code: number; stdout: string; stderr: string }> {
+  const isWin = process.platform === 'win32'
+  const name = isWin ? 'dev-cleaner.ps1' : 'dev-cleaner.sh'
+  const candidates = [
+    path.resolve(__dirname, '..', '..', '..', name),
+    path.join(process.resourcesPath || '', name)
+  ]
+  const script = candidates.find(c => fs.existsSync(c))
+  if (!script) return { code: -1, stdout: '', stderr: 'Script not found: ' + name }
+
+  const args: string[] = []
+  let cmd = ''
+  if (isWin) {
+    cmd = 'powershell.exe'
+    args.push('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', script, '-Task', task, '-Yes', '-NoElevate')
+    if (opts?.dryRun) args.push('-DryRun')
+    if (opts?.flutterDir) args.push('-FlutterDir', opts.flutterDir)
+    if (opts?.vsDir) args.push('-VsDir', opts.vsDir)
+  } else {
+    cmd = 'bash'
+    args.push(script, '--task', task, '--yes')
+    if (opts?.dryRun) args.push('--dry-run')
+    if (opts?.flutterDir) args.push('--flutter-dir', opts.flutterDir)
+    if (opts?.vsDir) args.push('--vs-dir', opts.vsDir)
+  }
+
+  return await new Promise((resolve) => {
+    const proc = spawn(cmd, args, { windowsHide: true })
+    let stdout = ''
+    let stderr = ''
+    proc.stdout.on('data', (d) => { stdout += d.toString() })
+    proc.stderr.on('data', (d) => { stderr += d.toString() })
+    proc.on('error', (e) => { stderr += e.message })
+    proc.on('close', (code) => resolve({ code: code ?? -1, stdout, stderr }))
+  })
+}
+
 export function registerCleanupIpc(ipcMain: any, store: Store) {
   ipcMain.handle('cleanup:scanTargets', async () => {
     const items: ScanItem[] = []
@@ -218,41 +255,5 @@ export function registerCleanupIpc(ipcMain: any, store: Store) {
     return result
   })
 
-  ipcMain.handle('cleanup:runTask', async (_e: any, task: string, opts: any) => {
-    const isWin = process.platform === 'win32'
-    const name = isWin ? 'dev-cleaner.ps1' : 'dev-cleaner.sh'
-    const candidates = [
-      path.resolve(__dirname, '..', '..', '..', name),
-      path.join(process.resourcesPath || '', name),
-      path.join(process.resourcesPath || '', 'scripts', name)
-    ]
-    const script = candidates.find(c => fs.existsSync(c))
-    if (!script) return { code: -1, stdout: '', stderr: 'Script not found: ' + name }
-
-    const args: string[] = []
-    let cmd = ''
-    if (isWin) {
-      cmd = 'powershell.exe'
-      args.push('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', script, '-Task', task, '-Yes', '-NoElevate')
-      if (opts?.dryRun) args.push('-DryRun')
-      if (opts?.flutterDir) args.push('-FlutterDir', opts.flutterDir)
-      if (opts?.vsDir) args.push('-VsDir', opts.vsDir)
-    } else {
-      cmd = 'bash'
-      args.push(script, '--task', task, '--yes')
-      if (opts?.dryRun) args.push('--dry-run')
-      if (opts?.flutterDir) args.push('--flutter-dir', opts.flutterDir)
-      if (opts?.vsDir) args.push('--vs-dir', opts.vsDir)
-    }
-
-    return await new Promise((resolve) => {
-      const proc = spawn(cmd, args, { windowsHide: true })
-      let stdout = ''
-      let stderr = ''
-      proc.stdout.on('data', (d) => { stdout += d.toString() })
-      proc.stderr.on('data', (d) => { stderr += d.toString() })
-      proc.on('error', (e) => { stderr += e.message })
-      proc.on('close', (code) => resolve({ code: code ?? -1, stdout, stderr }))
-    })
-  })
+  ipcMain.handle('cleanup:runTask', async (_e: any, task: string, opts: any) => runCleanupTask(task, opts))
 }
