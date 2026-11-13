@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import {
   LayoutDashboard, Scan, Trash2, Copy, FileSearch, AppWindow, Activity, History, Settings as SettingsIcon
 } from 'lucide-react'
+import logo from '@/assets/logo.png'
 
 const nav: { key: Page; label: string; icon: any }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -20,8 +21,8 @@ export function Layout({ page, setPage }: { page: Page; setPage: (p: Page) => vo
   return (
     <div className="flex h-screen w-full bg-background text-foreground">
       <aside className="w-64 border-r border-border bg-card flex flex-col">
-        <div className="p-4">
-          <div className="font-bold text-lg">Dev Cleaner</div>
+        <div className="p-4 flex items-center justify-center">
+          <img src={logo} alt="Dev Cleaner" className="h-12 w-auto object-contain" />
         </div>
         <Separator />
         <ScrollArea className="flex-1 px-2 py-3">
@@ -35,6 +36,8 @@ export function Layout({ page, setPage }: { page: Page; setPage: (p: Page) => vo
                   variant={active ? 'secondary' : 'ghost'}
                   className="justify-start gap-2"
                   onClick={() => setPage(item.key)}
+                  aria-current={active ? 'page' : undefined}
+                  aria-label={item.label}
                 >
                   <Icon className="h-4 w-4" />
                   {item.label}

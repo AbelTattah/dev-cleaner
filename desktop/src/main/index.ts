@@ -14,8 +14,8 @@ let mainWindow: BrowserWindow | null = null
 
 function iconPath(): string | undefined {
   const candidates = [
-    join(__dirname, '..', '..', '..', 'assets', 'icon.ico'),
-    join(__dirname, '..', '..', '..', 'assets', 'icon.png'),
+    join(__dirname, '..', '..', 'assets', 'icon.ico'),
+    join(__dirname, '..', '..', 'assets', 'icon.png'),
     join(process.resourcesPath || '', 'icon.ico'),
     join(process.resourcesPath || '', 'icon.png')
   ]
@@ -24,7 +24,7 @@ function iconPath(): string | undefined {
 
 function logoPath(): string | undefined {
   const candidates = [
-    join(__dirname, '..', '..', '..', 'assets', 'logo.png'),
+    join(__dirname, '..', '..', 'assets', 'logo.png'),
     join(process.resourcesPath || '', 'logo.png')
   ]
   return candidates.find(c => fs.existsSync(c))
