@@ -22,7 +22,7 @@ export function Layout({ page, setPage }: { page: Page; setPage: (p: Page) => vo
   return (
     <div className="flex h-screen w-full bg-background text-foreground">
       <aside className="w-64 border-r border-border bg-card flex flex-col">
-        <div className="p-4 flex items-center justify-center">
+        <div className="p-1 flex items-center justify-center">
           <img src={logo} alt="Dev Cleaner" className="h-32 w-auto object-contain" />
         </div>
         <Separator />
