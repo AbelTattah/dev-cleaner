@@ -12,6 +12,7 @@ export function SubscriptionPage() {
   const setStore = useAppStore(s => s.setSettings)
   const [s, setS] = useState<any>(null)
   const [email, setEmail] = useState('')
+  const [reference, setReference] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -58,12 +59,24 @@ export function SubscriptionPage() {
 
   const restore = async () => {
     const x = await window.api.settings.get()
-    setS(x)
-    setStore(x)
-    if (x.agentSubscriptionActive && (x.agentSubscriptionExpiresAt || 0) > Date.now()) {
+    const ref = reference || x.agentSubscriptionReference
+    if (!ref) { toast.error('Enter your payment reference'); return }
+    const backend = x.subscriptionBackendUrl || 'https://landing-pi-sable-38.vercel.app'
+    try {
+      const r = await fetch(backend.replace(/\/$/, '') + '/api/verify-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference: ref })
+      })
+      const data = await r.json()
+      if (!data.active) { toast.error(data.error || 'No active subscription found'); return }
+      const updated = { ...x, agentEnabled: true, agentSubscriptionActive: true, agentSubscriptionExpiresAt: data.expiresAt, agentSubscriptionReference: data.reference }
+      setS(updated)
+      setStore(updated)
+      await window.api.settings.set(updated)
       toast.success('Subscription restored')
-    } else {
-      toast.info('No active subscription found')
+    } catch (e: any) {
+      toast.error(e?.message || 'Restore failed')
     }
   }
 
@@ -104,6 +117,15 @@ export function SubscriptionPage() {
               <Button onClick={subscribe} disabled={loading} className="w-full">
                 {loading ? 'Opening payment...' : `Subscribe for GHS ${PRO_PRICE_GHS}/month`}
               </Button>
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={reference}
+                  onChange={e => setReference(e.target.value)}
+                  placeholder="Payment reference (for restore)"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
               <Button variant="outline" onClick={restore} className="w-full">
                 Restore subscription
               </Button>

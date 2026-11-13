@@ -64,4 +64,5 @@ export interface Settings {
   agentSubscriptionActive: boolean
   agentSubscriptionExpiresAt: number
   agentSubscriptionReference: string
+  subscriptionBackendUrl: string
 }

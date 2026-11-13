@@ -84,6 +84,10 @@ export function SettingsPage() {
             <div className="text-xs text-muted-foreground">
               When enabled, the agent runs in the background and clears only safe caches (temp, browser, app caches) when storage is low. Coding-related caches are never touched.
             </div>
+            <div className="space-y-2">
+              <Label>Subscription backend URL</Label>
+              <Input value={s.subscriptionBackendUrl} onChange={e => setS({ ...s, subscriptionBackendUrl: e.target.value })} />
+            </div>
           </div>
         </CardContent>
       </Card>

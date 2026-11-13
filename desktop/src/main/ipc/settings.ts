@@ -18,7 +18,8 @@ const defaults: Settings = {
   paystackPlanCode: '',
   agentSubscriptionActive: false,
   agentSubscriptionExpiresAt: 0,
-  agentSubscriptionReference: ''
+  agentSubscriptionReference: '',
+  subscriptionBackendUrl: 'https://landing-pi-sable-38.vercel.app'
 }
 
 export function registerSettingsIpc(ipcMain: any, store: Store, onChanged?: (s: Settings) => void) {
