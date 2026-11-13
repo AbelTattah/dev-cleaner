@@ -22,6 +22,14 @@ function iconPath(): string | undefined {
   return candidates.find(c => fs.existsSync(c))
 }
 
+function logoPath(): string | undefined {
+  const candidates = [
+    join(__dirname, '..', '..', '..', 'assets', 'logo.png'),
+    join(process.resourcesPath || '', 'logo.png')
+  ]
+  return candidates.find(c => fs.existsSync(c))
+}
+
 function createWindow() {
   const saved = store.get('windowBounds') as { x?: number; y?: number; width?: number; height?: number } | undefined
   mainWindow = new BrowserWindow({
@@ -98,7 +106,7 @@ app.whenReady().then(() => {
       { type: 'separator' }, { role: 'togglefullscreen' }
     ] },
     { label: 'Help', submenu: [
-      { label: 'About Dev Cleaner', click: () => dialog.showMessageBox({ message: 'Dev Cleaner Desktop v1.0.0' }) }
+      { label: 'About Dev Cleaner', click: () => dialog.showMessageBox({ title: 'About Dev Cleaner', message: 'Dev Cleaner Desktop v1.0.0', icon: logoPath() }) }
     ] }
   ]
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
