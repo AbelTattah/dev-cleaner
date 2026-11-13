@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Layout } from '@/components/layout'
 import { useAppStore } from '@/store'
 
-export type Page = 'overview' | 'deepscan' | 'junk' | 'monitor' | 'history' | 'settings'
+export type Page = 'overview' | 'deepscan' | 'junk' | 'subscription' | 'monitor' | 'history' | 'settings'
 
 export default function App() {
   const [page, setPage] = useState<Page>('overview')
