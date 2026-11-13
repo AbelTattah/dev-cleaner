@@ -19,7 +19,7 @@ const defaults: Settings = {
   agentSubscriptionActive: false,
   agentSubscriptionExpiresAt: 0,
   agentSubscriptionReference: '',
-  subscriptionBackendUrl: 'https://landing-pi-sable-38.vercel.app'
+  subscriptionBackendUrl: ''
 }
 
 export function registerSettingsIpc(ipcMain: any, store: Store, onChanged?: (s: Settings) => void) {

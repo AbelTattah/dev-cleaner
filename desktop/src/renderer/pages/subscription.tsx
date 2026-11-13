@@ -61,7 +61,8 @@ export function SubscriptionPage() {
     const x = await window.api.settings.get()
     const ref = reference || x.agentSubscriptionReference
     if (!ref) { toast.error('Enter your payment reference'); return }
-    const backend = x.subscriptionBackendUrl || 'https://landing-pi-sable-38.vercel.app'
+    const backend = x.subscriptionBackendUrl
+    if (!backend) { toast.error('No backend URL configured for restore'); return }
     try {
       const r = await fetch(backend.replace(/\/$/, '') + '/api/verify-subscription', {
         method: 'POST',
