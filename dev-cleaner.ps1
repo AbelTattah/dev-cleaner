@@ -10,7 +10,11 @@ param(
     [switch]$Help,
     [switch]$Version,
     [string]$FlutterDir,
-    [string]$VsDir
+    [string]$VsDir,
+    [string]$Task,
+    [switch]$DryRun,
+    [switch]$Yes,
+    [switch]$NoElevate
 )
 
 # --- Global Variables ---
@@ -99,6 +103,11 @@ function Remove-SafelyWithTracking {
         [string]$Path,
         [string]$Description
     )
+
+    if ($script:DryRun) {
+        Write-Host "[DRY-RUN] Would remove: $Description ($Path)" -ForegroundColor Yellow
+        return
+    }
 
     try {
         if (Test-Path $Path) {
@@ -543,6 +552,39 @@ function Clear-AppContainers {
     }
 }
 
+# --- Task Dispatcher (non-interactive) ---
+function Invoke-CleanupTask {
+    param([string]$TaskName)
+    $t = $TaskName.ToLower()
+    switch ($t) {
+        "all" {
+            Clear-VisualStudio -SearchDir $script:VsSearchDir
+            Clear-AndroidGradle
+            Clear-AndroidSdk
+            Clear-Flutter -SearchDir $script:FlutterSearchDir
+            Clear-NpmYarnPnpm
+            Clear-NuGet
+            Clear-PlatformIO
+            Clear-IdeCaches
+            Clear-WindowsTemp
+            Clear-BrowserCaches
+            Clear-AppContainers
+        }
+        "vs" { Clear-VisualStudio -SearchDir $script:VsSearchDir }
+        "android" { Clear-AndroidGradle }
+        "androidsdk" { Clear-AndroidSdk }
+        "flutter" { Clear-Flutter -SearchDir $script:FlutterSearchDir }
+        "npm" { Clear-NpmYarnPnpm }
+        "nuget" { Clear-NuGet }
+        "platformio" { Clear-PlatformIO }
+        "ide" { Clear-IdeCaches }
+        "temp" { Clear-WindowsTemp }
+        "browser" { Clear-BrowserCaches }
+        "apps" { Clear-AppContainers }
+        default { Write-Host "Unknown task: $TaskName" -ForegroundColor Red; exit 1 }
+    }
+}
+
 # --- Menu Display ---
 
 function Show-Menu {
@@ -781,8 +823,13 @@ if ($script:VsSearchDir -ne "." -and -not (Test-Path $script:VsSearchDir)) {
     $script:VsDirSource = "default"
 }
 
-# Request elevation
-Request-Elevation
+# Dry-run flag
+$script:DryRun = [bool]$DryRun
+
+# Request elevation (unless disabled for non-interactive/GUI use)
+if (-not $NoElevate) {
+    Request-Elevation
+}
 
 # Initial confirmation
 Clear-Host
@@ -819,11 +866,27 @@ if ($script:VsSearchDir -ne ".") {
 Write-Host "⚠️ This action is IRREVERSIBLE for deleted files. ⚠️" -ForegroundColor Yellow
 Write-Host "Please CLOSE all development applications (Visual Studio, Android Studio, VSCode, etc.) before running." -ForegroundColor Yellow
 Write-Host ""
-$initialConfirm = Read-Host "Are you sure you want to start the cleanup utility? (y/N)"
-
-if ($initialConfirm -ne "y" -and $initialConfirm -ne "Y") {
-    Write-Host "Cleanup utility cancelled."
+# Non-interactive task mode (used by desktop GUI)
+if ($Task) {
+    if (-not $Yes) {
+        $initialConfirm = Read-Host "Run task '$Task'? (y/N)"
+        if ($initialConfirm -ne "y" -and $initialConfirm -ne "Y") {
+            Write-Host "Cancelled."
+            exit 0
+        }
+    }
+    Write-Host "--- Running task: $Task ---" -ForegroundColor Cyan
+    Invoke-CleanupTask -TaskName $Task
+    Write-Host "--- Task completed ---" -ForegroundColor Green
     exit 0
+}
+
+if (-not $Yes) {
+    $initialConfirm = Read-Host "Are you sure you want to start the cleanup utility? (y/N)"
+    if ($initialConfirm -ne "y" -and $initialConfirm -ne "Y") {
+        Write-Host "Cleanup utility cancelled."
+        exit 0
+    }
 }
 
 # Start main loop

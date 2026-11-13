@@ -31,6 +31,8 @@ fi
 SCRIPT_VERSION="1.2.0"
 GITHUB_REPO="https://github.com/jemishavasoya/dev-cleaner"
 DRY_RUN=false
+TASK=""
+YES=false
 
 # Check if FLUTTER_SEARCH_DIR is already set as environment variable
 if [ -z "${FLUTTER_SEARCH_DIR}" ]; then
@@ -529,6 +531,44 @@ cleanup_timemachine_snapshots() {
     fi
 }
 
+# --- Task Dispatcher (non-interactive) ---
+run_task() {
+    case "$1" in
+        all)
+            cleanup_xcode
+            cleanup_android
+            cleanup_android_sdk
+            cleanup_flutter "$FLUTTER_SEARCH_DIR"
+            cleanup_platformIO
+            cleanup_npm_yarn
+            cleanup_homebrew
+            cleanup_cocoapods
+            cleanup_ide_caches
+            cleanup_system_junk
+            cleanup_browser_caches
+            cleanup_app_containers
+            cleanup_timemachine_snapshots
+            ;;
+        xcode) cleanup_xcode ;;
+        android) cleanup_android ;;
+        androidsdk) cleanup_android_sdk ;;
+        flutter) cleanup_flutter "$FLUTTER_SEARCH_DIR" ;;
+        npm) cleanup_npm_yarn ;;
+        homebrew) cleanup_homebrew ;;
+        cocoapods) cleanup_cocoapods ;;
+        ide) cleanup_ide_caches ;;
+        system) cleanup_system_junk ;;
+        browser) cleanup_browser_caches ;;
+        platformio) cleanup_platformIO ;;
+        apps) cleanup_app_containers ;;
+        timemachine) cleanup_timemachine_snapshots ;;
+        *)
+            echo -e "${RED}Unknown task: $1${NC}"
+            exit 1
+            ;;
+    esac
+}
+
 # --- Main Display Function ---
 display_menu() {
     clear
@@ -762,15 +802,26 @@ while [[ $# -gt 0 ]]; do
             ;;
         --flutter-dir)
             if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
-                # Expand ~ to home directory
                 FLUTTER_SEARCH_DIR="${2/#\~/$HOME}"
                 FLUTTER_DIR_SOURCE="command-line"
                 shift 2
             else
                 echo -e "${RED}Error: --flutter-dir requires a directory path${NC}"
-                echo "Use -h or --help for usage information"
                 exit 1
             fi
+            ;;
+        --task)
+            if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+                TASK="$2"
+                shift 2
+            else
+                echo -e "${RED}Error: --task requires a task name${NC}"
+                exit 1
+            fi
+            ;;
+        --yes)
+            YES=true
+            shift
             ;;
         *)
             echo -e "${RED}Error: Unknown option: $1${NC}"
@@ -826,8 +877,15 @@ else
     echo ""
     read -p "Are you sure you want to start the cleanup utility? (y/N): " initial_confirm
 fi
-if [[ "$initial_confirm" != "y" && "$initial_confirm" != "Y" ]]; then
+if [[ "$initial_confirm" != "y" && "$initial_confirm" != "Y" && "$YES" != "true" && -z "$TASK" ]]; then
     echo "Cleanup utility cancelled."
+    exit 0
+fi
+
+if [ -n "$TASK" ]; then
+    echo -e "${BLUE}--- Running task: ${TASK} ---${NC}"
+    run_task "$TASK"
+    echo -e "${GREEN}--- Task completed ---${NC}"
     exit 0
 fi
 

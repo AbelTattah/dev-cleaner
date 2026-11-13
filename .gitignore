@@ -10,3 +10,8 @@ docs/
 # Windows
 Thumbs.db
 desktop.ini
+
+# Desktop app
+desktop/node_modules/
+desktop/out/
+desktop/dist/

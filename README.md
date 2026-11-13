@@ -166,6 +166,30 @@ The Flutter cleanup option (Option 4) performs a comprehensive recursive cleanup
 **Expected Space Savings:** Users have reported freeing up 50-100GB+ of disk space after running Flutter cleanup on multiple projects.
 ### You can also buy me a cup of coffee &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.buymeacoffee.com/jempatellbv" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Tea" style="height: 60px !important;width: 217px !important;" ></a>
 
+## 🖥️ Desktop App (Electron)
+
+A desktop GUI is available under `desktop/`, built with Electron, React, TypeScript and shadcn/ui. It wraps the existing dev-cleaner engine (PowerShell on Windows, Bash on macOS/Linux) so the original cleanup logic remains the backend.
+
+### Run in development
+```bash
+cd desktop
+npm install
+npm run dev
+```
+
+### Build
+```bash
+cd desktop
+npm run build
+```
+
+### Features
+- Storage overview and drive usage
+- Deep folder size scanning
+- Developer-focused cleanup tasks mapped to the original script (Visual Studio, Android/Gradle, Flutter, npm, IDEs, browsers, app caches, etc.)
+- Safe execution with confirmation, protected directories, quarantine, dry-run
+- Cleanup history and settings
+
 ## 🤩 Contribution 
 
 We welcome you to submit Issues and Pull Requests!
