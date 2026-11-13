@@ -7,7 +7,47 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
+    "package": "electron-vite build && electron-builder",
     "start": "electron ."
+  },
+  "build": {
+    "appId": "com.devcleaner.app",
+    "productName": "Dev Cleaner",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../dev-cleaner.ps1",
+        "to": "dev-cleaner.ps1"
+      },
+      {
+        "from": "../dev-cleaner.sh",
+        "to": "dev-cleaner.sh"
+      },
+      {
+        "from": "assets/icon.ico",
+        "to": "icon.ico"
+      },
+      {
+        "from": "assets/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "icon": "assets/icon.ico",
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.4.1",
@@ -40,6 +80,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "electron": "^33.2.0",
+    "electron-builder": "^26.18.0",
     "electron-vite": "^2.3.0",
     "postcss": "^8.4.49",
     "tailwind-merge": "^2.5.4",
