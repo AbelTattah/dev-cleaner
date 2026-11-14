@@ -67,28 +67,7 @@ export function SettingsPage() {
             <Input type="number" value={s.maxScanDepth} onChange={e => setS({ ...s, maxScanDepth: Number(e.target.value) })} />
           </div>
 
-          <div className="pt-4 border-t border-border space-y-4">
-            <h3 className="font-semibold">Proactive Storage Agent</h3>
-            <div className="flex items-center justify-between">
-              <Label>Enable background agent</Label>
-              <Switch checked={s.agentEnabled} onCheckedChange={v => setS({ ...s, agentEnabled: v })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Check interval (minutes)</Label>
-              <Input type="number" value={s.agentIntervalMinutes} onChange={e => setS({ ...s, agentIntervalMinutes: Number(e.target.value) })} />
-            </div>
-            <div className="space-y-2">
-              <Label>Low storage threshold (GB)</Label>
-              <Input type="number" value={s.agentLowThresholdGB} onChange={e => setS({ ...s, agentLowThresholdGB: Number(e.target.value) })} />
-            </div>
-            <div className="text-xs text-muted-foreground">
-              When enabled, the agent runs in the background and clears only safe caches (temp, browser, app caches) when storage is low. Coding-related caches are never touched.
-            </div>
-            <div className="space-y-2">
-              <Label>Subscription backend URL</Label>
-              <Input value={s.subscriptionBackendUrl} onChange={e => setS({ ...s, subscriptionBackendUrl: e.target.value })} />
-            </div>
-          </div>
+
         </CardContent>
       </Card>
 

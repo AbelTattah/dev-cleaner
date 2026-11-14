@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import {
-  LayoutDashboard, Scan, Trash2, Copy, FileSearch, AppWindow, Activity, History, Settings as SettingsIcon, CreditCard
+  LayoutDashboard, Scan, Trash2, Copy, FileSearch, AppWindow, Activity, History, Settings as SettingsIcon
 } from 'lucide-react'
 import logo from '@/assets/logo.png'
 
@@ -12,7 +12,6 @@ const nav: { key: Page; label: string; icon: any }[] = [
   { key: 'overview', label: 'Overview', icon: LayoutDashboard },
   { key: 'deepscan', label: 'Deep Scan', icon: Scan },
   { key: 'junk', label: 'Developer Cleanup', icon: Trash2 },
-  { key: 'subscription', label: 'Pro Subscription', icon: CreditCard },
   { key: 'monitor', label: 'Monitor', icon: Activity },
   { key: 'history', label: 'History', icon: History },
   { key: 'settings', label: 'Settings', icon: SettingsIcon }
@@ -59,7 +58,6 @@ export function Layout({ page, setPage }: { page: Page; setPage: (p: Page) => vo
 import { OverviewPage } from '@/pages/overview'
 import { DeepScanPage } from '@/pages/deepscan'
 import { JunkPage } from '@/pages/junk'
-import { SubscriptionPage } from '@/pages/subscription'
 import { MonitorPage } from '@/pages/monitor'
 import { HistoryPage } from '@/pages/history'
 import { SettingsPage } from '@/pages/settings'
@@ -69,7 +67,6 @@ function PageContent({ page }: { page: Page }) {
     case 'overview': return <OverviewPage />
     case 'deepscan': return <DeepScanPage />
     case 'junk': return <JunkPage />
-    case 'subscription': return <SubscriptionPage />
     case 'monitor': return <MonitorPage />
     case 'history': return <HistoryPage />
     case 'settings': return <SettingsPage />
